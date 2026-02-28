@@ -1,0 +1,24 @@
+--- /Users/lizhenyu/Desktop/solrAE/solr-8.11.4/solr/core/src/java/org/apache/solr/update/DefaultSolrCoreState.java	2025-12-11 15:59:12
++++ /Users/lizhenyu/Desktop/solrAE/solr-8.11.4/solr/core/src/java/org/apache/solr/update/DefaultSolrCoreStatePatch.java	2025-12-11 16:13:51
+@@ -288,8 +288,21 @@
+     return recoveryStrategyBuilder;
+   }
+ 
++  public boolean initiatedFromPilotRun() {
++     for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
++        if (element.toString().contains("execute$pilot")) {
++           return true;
++        }
++     }
++     return false;
++  }
++
+   @Override
+   public void doRecovery(CoreContainer cc, CoreDescriptor cd) {
++    if(!initiatedFromPilotRun()) {
++      log.info("AE workaround");
++      return;
++    }
+     Runnable recoveryTask = new Runnable() {
+       @Override
+       public void run() {

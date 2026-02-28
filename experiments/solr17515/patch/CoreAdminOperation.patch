@@ -1,0 +1,55 @@
+--- /Users/lizhenyu/Desktop/solrAE/solr-8.11.4/solr/core/src/java/org/apache/solr/handler/admin/CoreAdminOperation.java	2025-12-12 08:03:15
++++ /Users/lizhenyu/Desktop/solrAE/solr-8.11.4/solr/core/src/java/org/apache/solr/handler/admin/CoreAdminOperationpatched.java	2025-12-12 07:51:15
+@@ -16,6 +16,9 @@
+  */
+ package org.apache.solr.handler.admin;
+ 
++import org.pilot.PilotUtil;
++import org.pilot.STATUS;
++import io.opentelemetry.context.Context;
+ import java.io.IOException;
+ import java.lang.invoke.MethodHandles;
+ import java.nio.file.Path;
+@@ -156,11 +159,36 @@
+     SPLIT_OP(SPLIT, new SplitOp()),
+ 
+     PREPRECOVERY_OP(PREPRECOVERY, new PrepRecoveryOp()),
++
++    public static void execute$pilot(CallInfo it, String cname) throws Exception {
++        try (SolrCore core = it.handler.coreContainer.getCore(cname)) {
++            if (core != null) {
++                // This can take a while, but doRecovery is already async so don't worry about it here
++                SolrCoreState coreState = core.getUpdateHandler().getSolrCoreState();
++                coreState.doRecovery(it.handler.coreContainer, core.getCoreDescriptor());
++            } else {
++                throw new SolrException(ErrorCode.BAD_REQUEST, "Unable to locate core " + cname);
++            }
++        }
++    }
+ 
+     REQUESTRECOVERY_OP(REQUESTRECOVERY, it -> {
+         final SolrParams params = it.req.getParams();
+         final String cname = params.required().get(CoreAdminParams.CORE);
+         log().info("It has been requested that we recover: core=" + cname);
++        String pilotMode = params.get("pilot");
++        if(Boolean.valueOf(pilotMode)){
++            Context ctx = PilotUtil.start(() -> {
++                log().info("Pilot is + "+PilotUtil.isDryRun());
++                try {
++                    execute$pilot(it, cname);
++                } catch (Exception e) {
++                    throw new SolrException(ErrorCode.SERVER_ERROR, "Pilot execution failed for core: " + cname, e);
++                }
++            });
++            STATUS res = PilotUtil.waitUntilPilotExecutionFinished(ctx);
++            return;
++        }
+ 
+         try (SolrCore core = it.handler.coreContainer.getCore(cname)) {
+             if (core != null) {
+@@ -372,4 +400,4 @@
+             throw new SolrException(ErrorCode.SERVER_ERROR, "Error handling '" + action.name() + "' action", e);
+         }
+     }
+-}
++    }
