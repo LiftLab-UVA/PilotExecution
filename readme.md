@@ -51,6 +51,7 @@ PILOT works in two phases:
 - **JDK:** OpenJDK 8
 - **Git:** >= 2.16.2
 - **Apache Maven:** >= 3.6.3
+- **Apache Ant:** >= 1.10.9
 
 > [!TIP]
 > We **highly recommend** using our [CloudLab profile](#0-set-up-cloudlab-machines-recommended), which provisions a ready-to-use three-node cluster with all dependencies pre-installed.
@@ -124,7 +125,7 @@ You should see `ZooKeeper Cluster Deployment Completed` on success.
 
 This walkthrough demonstrates PILOT's full workflow using [SOLR-17515](https://issues.apache.org/jira/browse/SOLR-17515), a real-world recovery bug in Apache Solr.
 
-**Scenario:** One node in a Solr cluster fails. The operator attempts recovery by having the failed node sync with an alive node and rejoin the cluster. On the buggy version, this recovery silently fails due to an incorrect configuration.
+**Scenario:** One node in a Solr cluster fails. The operator attempts recovery by having the failed node sync with an alive node and rejoin the cluster. On the buggy version, this recovery fails with NPE due to an incorrect configuration.
 
 > [!IMPORTANT]
 > Complete all [Getting Started](#getting-started) steps before proceeding. All commands run on **`node0`**.
