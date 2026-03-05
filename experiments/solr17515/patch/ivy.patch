@@ -1,0 +1,13 @@
+--- ivy.xml	2024-09-19 13:32:03
++++ patchedivy.xml	2025-12-11 13:14:53
+@@ -30,6 +30,10 @@
+   </configurations>
+ 
+   <dependencies>
++    <dependency org="io.opentelemetry" name="opentelemetry-api" rev="1.44.1" conf="compile" />
++    <dependency org="io.opentelemetry" name="opentelemetry-sdk" rev="1.44.1" conf="compile" />
++    <dependency org="io.opentelemetry" name="opentelemetry-exporter-otlp" rev="1.44.1" conf="compile" />
++    <dependency org="org.pilot" name="pilot-util" rev="1.0" conf="compile->default"/>
+     <dependency org="io.opentracing" name="opentracing-api" rev="${/io.opentracing/opentracing-api}" conf="compile"/>
+     <dependency org="io.opentracing" name="opentracing-noop" rev="${/io.opentracing/opentracing-noop}" conf="compile"/>
+     <dependency org="io.opentracing" name="opentracing-util" rev="${/io.opentracing/opentracing-util}" conf="compile"/>

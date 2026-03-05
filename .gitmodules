@@ -1,0 +1,6 @@
+[submodule "cloning"]
+	path = cloning
+	url = https://github.com/JHSUYU/cloning
+[submodule "Pilot"]
+	path = Pilot
+	url = https://github.com/LiftLab-UVA/Pilot
